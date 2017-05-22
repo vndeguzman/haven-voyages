@@ -25,6 +25,7 @@ module.exports = function (PortCall) {
     PortCall.find(query)
       .then(calls => {
         let voyages = [];
+
         let routes = _.chain(calls)
           .groupBy('routeId')
           .map((value, key) => { return { routeId: key, calls: value } })
@@ -82,6 +83,7 @@ module.exports = function (PortCall) {
           });
 
           voyages = _.union(voyages, transhipments);
+
         }
         return cb(null, voyages);
       })
