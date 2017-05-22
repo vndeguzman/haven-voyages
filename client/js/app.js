@@ -2,7 +2,8 @@ angular
   .module('app', [
     'lbServices',
     'ui.router',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'ngProgress'
   ])
   .config(['$stateProvider', '$urlRouterProvider',
     function($stateProvider, $urlRouterProvider) {

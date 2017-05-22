@@ -13,15 +13,15 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
 (function(window, angular, undefined) {
   'use strict';
 
-  var urlBase = "/api";
-  var authHeader = 'authorization';
+  let urlBase = "/api";
+  let authHeader = 'authorization';
 
   function getHost(url) {
-    var m = url.match(/^(?:https?:)?\/\/([^\/]+)/);
+    let m = url.match(/^(?:https?:)?\/\/([^\/]+)/);
     return m ? m[1] : null;
   }
 
-  var urlBaseHost = getHost(urlBase) || location.host;
+  let urlBaseHost = getHost(urlBase) || location.host;
 
 /**
  * @ngdoc overview
@@ -33,7 +33,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
  * the models exposed by the LoopBack server via the REST API.
  *
  */
-  var module = angular.module("lbServices", ['ngResource']);
+  let module = angular.module("lbServices", ['ngResource']);
 
 /**
  * @ngdoc object
@@ -55,9 +55,9 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
   module.factory(
     "User",
     [
-      'LoopBackResource', 'LoopBackAuth', '$injector',
-      function(Resource, LoopBackAuth, $injector) {
-        var R = Resource(
+      'LoopBackResource', 'LoopBackAuth', '$injector', '$q',
+      function(LoopBackResource, LoopBackAuth, $injector, $q) {
+        let R = LoopBackResource(
         urlBase + "/Users/:id",
           { 'id': '@id' },
           {
@@ -551,7 +551,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              *  - `id` – `{*}` - Model id
              *
-             *  - `filter` – `{object=}` - Filter defining fields and include
+             *  - `filter` – `{object=}` - Filter defining fields and include - must be a JSON-encoded string ({"something":"value"})
              *
              * @param {function(Object,Object)=} successCb
              *   Success callback with two arguments: `value`, `responseHeaders`.
@@ -621,7 +621,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit
+             *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({"something":"value"})
              *
              * @param {function(Array.<Object>,Object)=} successCb
              *   Success callback with two arguments: `value`, `responseHeaders`.
@@ -655,7 +655,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit
+             *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({"something":"value"})
              *
              * @param {function(Object,Object)=} successCb
              *   Success callback with two arguments: `value`, `responseHeaders`.
@@ -893,7 +893,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
               },
               interceptor: {
                 response: function(response) {
-                  var accessToken = response.data;
+                  let accessToken = response.data;
                   LoopBackAuth.setUser(
                     accessToken.id, accessToken.userId, accessToken.user);
                   LoopBackAuth.rememberMe =
@@ -922,7 +922,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object} postData Request data.
              *
-             *  - `access_token` – `{string}` - Do not supply this argument, it is automatically extracted from request headers.
+             *  - `access_token` – `{string=}` - Do not supply this argument, it is automatically extracted from request headers.
              *
              * @param {function(Object,Object)=} successCb
              *   Success callback with two arguments: `value`, `responseHeaders`.
@@ -1047,7 +1047,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
               method: 'GET',
               params: {
                 id: function() {
-                  var id = LoopBackAuth.currentUserId;
+                  let id = LoopBackAuth.currentUserId;
                   if (id == null) id = '__anonymous__';
                   return id;
                 },
@@ -1056,6 +1056,11 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
                 response: function(response) {
                   LoopBackAuth.currentUserData = response.data;
                   return response.resource;
+                },
+                responseError: function(responseError) {
+                  LoopBackAuth.clearUser();
+                  LoopBackAuth.clearStorage();
+                  return $q.reject(responseError);
                 },
               },
               __isGetCurrentUser__: true,
@@ -1310,7 +1315,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
          * @returns {Object} A User instance.
          */
         R.getCachedCurrent = function() {
-          var data = LoopBackAuth.currentUserData;
+          let data = LoopBackAuth.currentUserData;
           return data ? new R(data) : null;
         };
 
@@ -1371,9 +1376,9 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
   module.factory(
     "PortCall",
     [
-      'LoopBackResource', 'LoopBackAuth', '$injector',
-      function(Resource, LoopBackAuth, $injector) {
-        var R = Resource(
+      'LoopBackResource', 'LoopBackAuth', '$injector', '$q',
+      function(LoopBackResource, LoopBackAuth, $injector, $q) {
+        let R = LoopBackResource(
         urlBase + "/PortCalls/:id",
           { 'id': '@id' },
           {
@@ -1613,7 +1618,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              *  - `id` – `{*}` - Model id
              *
-             *  - `filter` – `{object=}` - Filter defining fields and include
+             *  - `filter` – `{object=}` - Filter defining fields and include - must be a JSON-encoded string ({"something":"value"})
              *
              * @param {function(Object,Object)=} successCb
              *   Success callback with two arguments: `value`, `responseHeaders`.
@@ -1683,7 +1688,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit
+             *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({"something":"value"})
              *
              * @param {function(Array.<Object>,Object)=} successCb
              *   Success callback with two arguments: `value`, `responseHeaders`.
@@ -1717,7 +1722,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              * @param {Object=} parameters Request parameters.
              *
-             *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit
+             *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({"something":"value"})
              *
              * @param {function(Object,Object)=} successCb
              *   Success callback with two arguments: `value`, `responseHeaders`.
@@ -1933,6 +1938,8 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *  - `etd` – `{date=}` -
              *
              *  - `eta` – `{date=}` -
+             *
+             *  - `isTranshipmentEnabled` – `{boolean=}` -
              *
              * @param {function(Array.<Object>,Object)=} successCb
              *   Success callback with two arguments: `value`, `responseHeaders`.
@@ -2207,11 +2214,11 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
 
   module
   .factory('LoopBackAuth', function() {
-    var props = ['accessTokenId', 'currentUserId', 'rememberMe'];
-    var propsPrefix = '$LoopBack$';
+    let props = ['accessTokenId', 'currentUserId', 'rememberMe'];
+    let propsPrefix = '$LoopBack$';
 
     function LoopBackAuth() {
-      var self = this;
+      let self = this;
       props.forEach(function(name) {
         self[name] = load(name);
       });
@@ -2219,8 +2226,8 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
     }
 
     LoopBackAuth.prototype.save = function() {
-      var self = this;
-      var storage = this.rememberMe ? localStorage : sessionStorage;
+      let self = this;
+      let storage = this.rememberMe ? localStorage : sessionStorage;
       props.forEach(function(name) {
         save(storage, name, self[name]);
       });
@@ -2251,7 +2258,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
     // We are using empty string as a marker for null/undefined values.
     function save(storage, name, value) {
       try {
-        var key = propsPrefix + name;
+        let key = propsPrefix + name;
         if (value == null) value = '';
         storage[key] = value;
       } catch (err) {
@@ -2260,7 +2267,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
     }
 
     function load(name) {
-      var key = propsPrefix + name;
+      let key = propsPrefix + name;
       return localStorage[key] || sessionStorage[key] || null;
     }
   })
@@ -2272,7 +2279,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
       return {
         'request': function(config) {
           // filter out external requests
-          var host = getHost(config.url);
+          let host = getHost(config.url);
           if (host && host !== urlBaseHost) {
             return config;
           }
@@ -2282,7 +2289,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
           } else if (config.__isGetCurrentUser__) {
             // Return a stub 401 error for User.getCurrent() when
             // there is no user logged in
-            var res = {
+            let res = {
               body: { error: { status: 401 }},
               status: 401,
               config: config,
@@ -2368,8 +2375,8 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
     };
 
     this.$get = ['$resource', function($resource) {
-      var LoopBackResource = function(url, params, actions) {
-        var resource = $resource(url, params, actions);
+      let LoopBackResource = function(url, params, actions) {
+        let resource = $resource(url, params, actions);
 
         // Angular always calls POST on $save()
         // This hack is based on
@@ -2377,7 +2384,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
         resource.prototype.$save = function(success, error) {
           // Fortunately, LoopBack provides a convenient `upsert` method
           // that exactly fits our needs.
-          var result = resource.upsert.call(this, {}, this, success, error);
+          let result = resource.upsert.call(this, {}, this, success, error);
           return result.$promise || result;
         };
         return resource;

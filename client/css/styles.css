@@ -1,3 +1,41 @@
 body {
   padding-top: 50px
 }
+
+.top-buffer {
+  margin-top: 20px;
+}
+
+.left-buffer {
+  margin-left: 20px;
+}
+
+.left-buffer-sm {
+  margin-left: 5px;
+}
+
+.right-buffer {
+  margin-right: 20px;
+}
+
+.right-buffer-sm {
+  margin-right: 5px;
+}
+
+.highlightedText {
+  background: #ffea6f;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  background-color: #F5F5F5;
+}
+
+.unselectable {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}

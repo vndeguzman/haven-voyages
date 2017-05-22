@@ -1,24 +1,24 @@
 <div class="container">
-
-  <h1>Voyages</h1>
-
   <!-- Sample interface -->
 
-  <form class="form-inline">
+  <form class="form-inline top-buffer">
     <div class="form-group">
-      <label>Departure Port</label>
+      <label for="etd">Origin Departure Date</label>
       <input
+        id="etd"
+        name="etd"
         type="text"
         class="form-control"
         ng-click="ctrl.isEtdOpen = !ctrl.isEtdOpen"
         uib-datepicker-popup="{{format}}"
         ng-model="ctrl.etd"
         datepicker-options="ctrl.dateOptions"
-        is-open="ctrl.isEtdOpen" />
+        is-open="ctrl.isEtdOpen"
+        ng-change="ctrl.getRoutes(ctrl.etd, ctrl.eta, ctrl.isTranshipmentEnabled)"
+      />
     </div>
-
-    <div class="form-group">
-      <label>Arrival port</label>
+    <div class="form-group left-buffer">
+      <label>Destination Arrival Date</label>
       <input
         type="text"
         class="form-control"
@@ -26,37 +26,128 @@
         uib-datepicker-popup="{{format}}"
         ng-model="ctrl.eta"
         datepicker-options="ctrl.dateOptions"
-        is-open="ctrl.isEtaOpen" />
+        is-open="ctrl.isEtaOpen"
+        ng-change="ctrl.getRoutes(ctrl.etd, ctrl.eta, ctrl.isTranshipmentEnabled)"
+      />
     </div>
-
-    <button
-      type="submit"
-      class="btn btn-primary"
-      ng-click="ctrl.getRoutes(ctrl.etd, ctrl.eta)">
-      Find
-    </button>
-
+    <div class="form-group left-buffer">
+      <label>
+        <input
+          type="checkbox"
+          class="form-control"
+          ng-model="ctrl.isTranshipmentEnabled"
+          ng-change="ctrl.getRoutes(ctrl.etd, ctrl.eta, ctrl.isTranshipmentEnabled)"
+        />
+        Show Transhipments
+      </label>
+    </div>
+    <div
+      class="form-group pull-right"
+      ng-show="ctrl.voyages.length"
+    >
+        <input
+          type="text"
+          class="form-control"
+          ng-model="ctrl.searchText.$"
+          placeholder="Search"
+        />
+    </div>
   </form>
-
   <!-- Display the list of Voyage data - this is just as an example of displaying the initial data -->
-  <table class="table table-striped"
-         ng-show="ctrl.voyages.length">
+  <table class="table table-striped table-hover top-buffer">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>Port</th>
-        <th>ETA</th>
-        <th>ETD</th>
+        <th class="clickable unselectable col-lg-1" ng-click="ctrl.setSortBy('routeId')">
+          Route
+          <span
+            class="pull-right glyphicon"
+            ng-show="ctrl.isSortBy('routeId')"
+            ng-class="{
+            'glyphicon-sort-by-attributes-alt': ctrl.isReverse(),
+            'glyphicon-sort-by-attributes': !ctrl.isReverse()
+            }"
+          >
+          </span>
+          </span>
+        </th>
+        <th class="clickable unselectable col-lg-3" ng-click="ctrl.setSortBy('vessel')">
+          Vessel
+          <span
+            class="pull-right glyphicon"
+            ng-show="ctrl.isSortBy('vessel')"
+            ng-class="{
+            'glyphicon-sort-by-attributes-alt': ctrl.isReverse(),
+            'glyphicon-sort-by-attributes': !ctrl.isReverse()
+            }"
+          >
+          </span>
+        </th>
+        <th class="clickable unselectable col-lg-2" ng-click="ctrl.setSortBy('origin')">
+          Origin
+          <span
+            class="pull-right glyphicon"
+            ng-show="ctrl.isSortBy('origin')"
+            ng-class="{
+            'glyphicon-sort-by-attributes-alt': ctrl.isReverse(),
+            'glyphicon-sort-by-attributes': !ctrl.isReverse()
+            }"
+          >
+          </span>
+        </th>
+        <th class="clickable unselectable" ng-click="ctrl.setSortBy('departure')">
+          Departure
+          <span
+            class="pull-right glyphicon"
+            ng-show="ctrl.isSortBy('departure')"
+            ng-class="{
+            'glyphicon-sort-by-attributes-alt': ctrl.isReverse(),
+            'glyphicon-sort-by-attributes': !ctrl.isReverse()
+            }"
+          >
+          </span>
+        </th>
+        <th class="clickable unselectable" ng-click="ctrl.setSortBy('destination')">
+          Destination
+          <span
+            class="pull-right glyphicon col-lg-2"
+            ng-show="ctrl.isSortBy('destination')"
+            ng-class="{
+            'glyphicon-sort-by-attributes-alt': ctrl.isReverse(),
+            'glyphicon-sort-by-attributes': !ctrl.isReverse()
+            }"
+          >
+          </span>
+        </th>
+        <th class="clickable unselectable" ng-click="ctrl.setSortBy('arrival')">
+          Arrival
+          <span
+            class="pull-right glyphicon"
+            ng-show="ctrl.isSortBy('arrival')"
+            ng-class="{
+            'glyphicon-sort-by-attributes-alt': ctrl.isReverse(),
+            'glyphicon-sort-by-attributes': !ctrl.isReverse()
+            }"
+          >
+          </span>
+        </th>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="voyage in ctrl.voyages">
-        <th>{{ voyage.id }}</th>
-        <td>{{ voyage.port }}</td>
-        <td>{{ (voyage.eta | date) || 'N/A' }}</td>
-        <td>{{ (voyage.etd | date) || 'N/A' }}</td>
+      <tr
+        class="clickable"
+        ng-repeat="voyage in (ctrl.filteredVoyages =
+        (ctrl.voyages | filter:ctrl.searchText:strict | orderBy:ctrl.sortBy.column:ctrl.sortBy.reverse))"
+      >
+        <td><span ng-bind-html="ctrl.highlight(voyage.routeId, ctrl.searchText.$, '->', 'glyphicon glyphicon-share')"></span></td>
+        <td><span ng-bind-html="ctrl.highlight(voyage.vessel, ctrl.searchText.$, '->', 'glyphicon glyphicon-share')"></span></td>
+        <td><span ng-bind-html="ctrl.highlight(voyage.origin, ctrl.searchText.$, '->', 'glyphicon glyphicon-share')"></span></td>
+        <td><span>{{ voyage.etd }}</span></td>
+        <td><span ng-bind-html="ctrl.highlight(voyage.destination, ctrl.searchText.$)"></span></td>
+        <td><span>{{ voyage.eta }}</span></td>
+      </tr>
+      <tr ng-show="ctrl.filteredVoyages.length === 0 || ctrl.eta == null || ctrl.etd == null">
+        <td colspan="6" class="text-center">No Result</td>
       </tr>
     </tbody>
   </table>
-
 </div>

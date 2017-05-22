@@ -1,22 +1,24 @@
 {
-  "name": "bacchus",
+  "name": "janus",
   "version": "1.0.0",
-  "description": "bacchus",
+  "description": "janus",
   "main": "server/server.js",
   "scripts": {
     "reload": "lb-ng server/server.js client/js/services/lb-services.js",
     "pretest": "jshint .",
     "postinstall": "bower install",
-    "start": "npm run reload && node .",
+    "start": "npm run reload && supervisor node .",
     "test": "./node_modules/.bin/mocha --reporter spec"
   },
   "dependencies": {
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "errorhandler": "^1.1.1",
+    "lodash": "^4.17.4",
     "loopback": "^2.14.0",
     "loopback-boot": "^2.6.5",
     "loopback-datasource-juggler": "^2.19.0",
+    "moment": "^2.18.1",
     "serve-favicon": "^2.0.1"
   },
   "optionalDependencies": {
@@ -31,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/HavenInc/bacchus"
+    "url": "https://github.com/HavenInc/janus"
   },
   "engines": {
     "node": "6"
